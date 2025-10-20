@@ -8,7 +8,7 @@ Please see instructions in [the book](https://matmek-4270.github.io/matmek4270-b
 
 # Some further instructions for this repo
 
-Purpose: 1D spectral Galerkin scaffolding for ODE/PDEs on an interval. The core is a small framework in `galerkin.py` for assembling mass/stiffness-like operators and projecting/solving with different polynomial/trigonometric bases and boundary-condition lifts.
+This repository contains a small framework in `galerkin.py` for assembling mass/stiffness-like operators and projecting/solving with different polynomial/trigonometric bases and boundary-condition lifts. The code is using classes for reuse of code and clarity, but is kept as simple as possible for educational purposes.
 
 Big picture (architecture)
 - Mapping helpers: `map_reference_domain`, `map_true_domain`, `map_expression_true_domain` convert points/expressions between the true domain and a basis-specific reference domain; always use these when mixing domains.
@@ -18,7 +18,7 @@ Big picture (architecture)
   - `Trigonometric` base has reference `(0, 1)` and adds a boundary lift in `eval` via `self.B.Xl(X)`; `Sines` is implemented, `Cosines` is a placeholder.
   - `Composite` spaces enforce boundary conditions via a lift `B` and a stencil matrix `S`, e.g. Dirichlet: ψ_i = Q_i − Q_{i+2}. Mass is assembled as `S · M · S^T` where `M` is diagonal in the orthogonal basis. Implementations include `DirichletChebyshev` (done) and placeholders for Legendre/Chebyshev Neumann and Legendre Dirichlet.
 - Boundary lifts: `Dirichlet` and `Neumann` construct an affine or quadratic function `B.x` on the physical domain and its reference-evaluator `B.Xl`. Solutions are represented as u(x) = Σ û_i ψ_i(x) + B.x.
-- Weak forms: `BasisFunction`, `TrialFunction`, `TestFunction` provide a tiny DSL. `inner(Trial.diff(k), Test)` builds derivative-weighted bilinear forms; `assemble_generic_matrix` integrates with proper weights and symmetry.
+- Weak forms: `BasisFunction`, `TrialFunction`, `TestFunction` provide a tiny domain-specific language (DSL). `inner(Trial.diff(k), Test)` builds derivative-weighted bilinear forms; `assemble_generic_matrix` integrates with proper weights and symmetry.
 
 Key files and examples
 - `galerkin.py` is the only source file and contains:
