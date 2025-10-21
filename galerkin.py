@@ -131,7 +131,7 @@ class Chebyshev(FunctionSpace):
         return Cheb.basis(j)
 
     def derivative_basis_function(self, j, k=1):
-        return self.basis_function(j).deriv(k)
+        raise NotImplementedError
 
     def weight(self, x=x):
         return 1 / sp.sqrt(1 - x**2)
@@ -143,9 +143,7 @@ class Chebyshev(FunctionSpace):
         raise NotImplementedError
 
     def eval(self, uh, xj):
-        xj = np.atleast_1d(xj)
-        Xj = map_reference_domain(xj, self.domain, self.reference_domain)
-        return np.polynomial.chebyshev.chebval(Xj, uh)
+        raise NotImplementedError
 
     def inner_product(self, u):
         us = map_expression_true_domain(u, x, self.domain, self.reference_domain)
@@ -256,7 +254,7 @@ class Neumann:
 
 
 class Composite(FunctionSpace):
-    """Base class for function spaces created as linear combinations of orthogonal basis functions
+    r"""Base class for function spaces created as linear combinations of orthogonal basis functions
 
     The composite basis functions are defined using the orthogonal basis functions
     (Chebyshev or Legendre) and a stencil matrix S. The stencil matrix S is used
