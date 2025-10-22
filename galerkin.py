@@ -347,7 +347,7 @@ class DirichletLegendre(Composite, Legendre):
 
 
 class NeumannLegendre(Composite, Legendre):
-    def __init__(self, N, domain=(-1, 1), bc=(0, 0), constraint=0):
+    def __init__(self, N, domain=(-1, 1), bc=(0, 0), constraint=0): # TODO: Implement for constraint
         """Similar to method in DirichletLegendre, but call Neumann instead."""
         Legendre.__init__(self, N, domain=domain)
         self.a = lambda j: -j*(j+1)/((j+2)*(j+3)) #coeff for NeumannLegendre basis
@@ -377,7 +377,7 @@ class DirichletChebyshev(Composite, Chebyshev):
 
 
 class NeumannChebyshev(Composite, Chebyshev):
-    def __init__(self, N, domain=(-1, 1), bc=(0, 0), constraint=0):
+    def __init__(self, N, domain=(-1, 1), bc=(0, 0), constraint=0): # TODO: Implement for constraint
         """Similar to method in DirichletChebyshev, but call Neumann instead and
            different stencil matrix.
         """
