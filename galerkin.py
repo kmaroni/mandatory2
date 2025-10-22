@@ -35,7 +35,7 @@ class FunctionSpace:
 
     @property
     def reference_domain(self):
-        raise RuntimeError
+        return (-1, 1)
 
     @property
     def domain_factor(self):
