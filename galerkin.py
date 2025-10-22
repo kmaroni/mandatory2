@@ -119,10 +119,13 @@ class Legendre(FunctionSpace):
         return self.basis_function(j).deriv(k)
 
     def L2_norm_sq(self, N):
-        raise NotImplementedError
+        """Return array of length N+1 with inner product (P_j,P_j) as entries."""
+        return np.array([(2*j+1)/2 for j in range(N)])
 
     def mass_matrix(self):
-        raise NotImplementedError
+        """Same as method in Trigonometric."""
+        return sparse.diags(
+            [self.L2_norm_sq(self.N+1)], [0], (self.N+1, self.N+1), format="csr")
 
     def eval(self, uh, xj):
         xj = np.atleast_1d(xj)
@@ -140,19 +143,29 @@ class Chebyshev(FunctionSpace):
         return Cheb.basis(j)
 
     def derivative_basis_function(self, j, k=1):
-        raise NotImplementedError
+        """Same as method in Legendre"""
+        return self.basis_function(j).deriv(k)
 
     def weight(self, x=x):
         return 1 / sp.sqrt(1 - x**2)
 
     def L2_norm_sq(self, N):
-        raise NotImplementedError
+        """Return array of length N with entries c_i*pi/2 where c_0=2 and c_i=1
+           for i>0.
+        """
+        return np.array([np.pi]+[np.pi/2]*(N-1)) #pi for i=0 and pi/2 for i>0
 
     def mass_matrix(self):
-        raise NotImplementedError
+        """Same as method in Trigonometric."""
+        return sparse.diags(
+            [self.L2_norm_sq(self.N+1)], [0], (self.N+1, self.N+1), format="csr")
 
     def eval(self, uh, xj):
-        raise NotImplementedError
+        """Similar to method in Legendre, but polynomial.legendre.legval swapped
+           with Cheb.chebval."""
+        xj = np.atleast_1d(xj)
+        Xj = map_reference_domain(xj, self.domain, self.reference_domain)
+        return np.Cheb.chebval(Xj, uh)
 
     def inner_product(self, u):
         us = map_expression_true_domain(u, x, self.domain, self.reference_domain)
