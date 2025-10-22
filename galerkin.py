@@ -338,7 +338,12 @@ class DirichletLegendre(Composite, Legendre):
         self.S = sparse.diags((1, -1), (0, 2), shape=(N + 1, N + 3), format="csr")
 
     def basis_function(self, j, sympy=False):
-        raise NotImplementedError
+        """Similar to method in DirichletChebyshev but swapped basis functions
+           for Legendre.
+        """
+        if sympy:
+            return sp.legendre(j, x)- sp.legendre(j+2, x)
+        return Leg.basis(j)-Leg.basis(j+2)
 
 
 class NeumannLegendre(Composite, Legendre):
@@ -346,7 +351,14 @@ class NeumannLegendre(Composite, Legendre):
         raise NotImplementedError
 
     def basis_function(self, j, sympy=False):
-        raise NotImplementedError
+        """Similar to method in DirichletLegendre, but mulitply P_j+2 with
+           coeff a(j).
+        """
+        a = j*(j+1)/((j+2)*(j+3))
+        if sympy:
+            return sp.legendre(j, x) - a*sp.legendre()
+        else:
+            return Leg.basis(j)-a*Leg.basis(j+2)
 
 
 class DirichletChebyshev(Composite, Chebyshev):
@@ -517,5 +529,5 @@ def test_convection_diffusion():
 
 if __name__ == "__main__":
     test_project()
-    #test_convection_diffusion()
-    #test_helmholtz()
+    test_convection_diffusion()
+    test_helmholtz()
