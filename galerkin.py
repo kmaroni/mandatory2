@@ -120,7 +120,7 @@ class Legendre(FunctionSpace):
 
     def L2_norm_sq(self, N):
         """Return array of length N+1 with inner product (P_j,P_j) as entries."""
-        return np.array([(2*j+1)/2 for j in range(N)])
+        return np.array([2/(2*j+1) for j in range(N)])
 
     def mass_matrix(self):
         """Same as method in Trigonometric."""
@@ -161,11 +161,12 @@ class Chebyshev(FunctionSpace):
             [self.L2_norm_sq(self.N+1)], [0], (self.N+1, self.N+1), format="csr")
 
     def eval(self, uh, xj):
-        """Similar to method in Legendre, but polynomial.legendre.legval swapped
-           with Cheb.chebval."""
+        """Similar to method in Legendre, but legendre.legval swapped with
+           chebyshev.chebval.
+        """
         xj = np.atleast_1d(xj)
         Xj = map_reference_domain(xj, self.domain, self.reference_domain)
-        return np.Cheb.chebval(Xj, uh)
+        return np.polynomial.chebyshev.chebval(Xj, uh)
 
     def inner_product(self, u):
         us = map_expression_true_domain(u, x, self.domain, self.reference_domain)
@@ -516,5 +517,5 @@ def test_convection_diffusion():
 
 if __name__ == "__main__":
     test_project()
-    test_convection_diffusion()
-    test_helmholtz()
+    #test_convection_diffusion()
+    #test_helmholtz()
