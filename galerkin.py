@@ -231,9 +231,9 @@ class Sines(Trigonometric):
 
 class Cosines(Trigonometric):
     def __init__(self, N, domain=(0, 1), bc=(0, 0)):
-        """Same as method in Sines."""
+        """Same as method in Sines, but calls Neumann."""
         Trigonometric.__init__(self, N, domain=domain)
-        self.B = Dirichlet(bc, domain, self.reference_domain)
+        self.B = Neumann(bc, domain, self.reference_domain)
 
     def basis_function(self, j, sympy=False):
         if sympy:
@@ -350,18 +350,18 @@ class NeumannLegendre(Composite, Legendre):
     def __init__(self, N, domain=(-1, 1), bc=(0, 0), constraint=0):
         """Similar to method in DirichletLegendre, but call Neumann instead."""
         Legendre.__init__(self, N, domain=domain)
+        self.a = lambda j: -j*(j+1)/((j+2)*(j+3)) #coeff for NeumannLegendre basis
         self.B = Neumann(bc, domain, self.reference_domain)
-        self.S = sparse.diags((1, -1), (0, 2), shape=(N + 1, N + 3), format="csr")
+        self.S = sparse.diags((np.ones(N+1), self.a(np.arange(N+1))), (0, 2), shape=(N + 1, N + 3), format="csr")
 
     def basis_function(self, j, sympy=False):
         """Similar to method in DirichletLegendre, but mulitply P_j+2 with
            coeff a(j).
         """
-        a = j*(j+1)/((j+2)*(j+3))
         if sympy:
-            return sp.legendre(j, x) - a*sp.legendre()
+            return sp.legendre(j, x) + self.a(j)*sp.legendre()
         else:
-            return Leg.basis(j)-a*Leg.basis(j+2)
+            return Leg.basis(j) + self.a(j)*Leg.basis(j+2)
 
 
 class DirichletChebyshev(Composite, Chebyshev):
@@ -378,10 +378,21 @@ class DirichletChebyshev(Composite, Chebyshev):
 
 class NeumannChebyshev(Composite, Chebyshev):
     def __init__(self, N, domain=(-1, 1), bc=(0, 0), constraint=0):
-        raise NotImplementedError
+        """Similar to method in DirichletChebyshev, but call Neumann instead and
+           different stencil matrix.
+        """
+        Chebyshev.__init__(self, N, domain=domain)
+        self.a = lambda j: -(j/(j+2))**2
+        self.B = Neumann(bc, domain, self.reference_domain)
+        self.S = sparse.diags((np.ones(N+1), self.a(np.arange(N+1))), (0, 2), shape=(N + 1, N + 3), format="csr")
 
     def basis_function(self, j, sympy=False):
-        raise NotImplementedError
+        """Similar to method in DirichletChebyshev, but mulitply T_j+2 with
+           coeff a(j).
+        """
+        if sympy:
+            return sp.cos(j * sp.acos(x)) + self.a(j) * sp.cos((j + 2) * sp.acos(x))
+        return Cheb.basis(j) + self.a(j) * Cheb.basis(j + 2)
 
 
 class BasisFunction:
