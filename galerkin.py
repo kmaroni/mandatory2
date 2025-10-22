@@ -230,16 +230,27 @@ class Sines(Trigonometric):
 
 class Cosines(Trigonometric):
     def __init__(self, N, domain=(0, 1), bc=(0, 0)):
-        raise NotImplementedError
+        """Same as method in Sines."""
+        Trigonometric.__init__(self, N, domain=domain)
+        self.B = Dirichlet(bc, domain, self.reference_domain)
 
     def basis_function(self, j, sympy=False):
-        raise NotImplementedError
+        if sympy:
+            return sp.cos(j*sp.pi * x)
+        else:
+            return lambda Xj: np.cos(j*np.pi * Xj)
 
     def derivative_basis_function(self, j, k=1):
-        raise NotImplementedError
+        """Similar to method in Sines, but rescaled and sapped sin and cos."""
+        scale = (j  * np.pi) ** k * {0: 1, 1: -1}[((k+1) // 2) % 2]
+        if k % 2 == 0:
+            return lambda Xj: scale * np.cos(j * np.pi * Xj)
+        else:
+            return lambda Xj: scale * np.sin(j * np.pi * Xj)
 
     def L2_norm_sq(self, N):
-        raise NotImplementedError
+        """Return array of length N with first entry 1 and 0.5 otherwise."""
+        return np.array([1]+[0.5]*(N-1))
 
 
 # Create classes to hold the boundary function
