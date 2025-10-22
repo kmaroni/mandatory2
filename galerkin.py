@@ -35,6 +35,9 @@ class FunctionSpace:
 
     @property
     def reference_domain(self):
+        """Return reference domain for Legendre and Chebyshev,
+           Trigonometric overides this method.
+        """
         return (-1, 1)
 
     @property
@@ -76,7 +79,13 @@ class FunctionSpace:
         return P
 
     def eval_derivative_basis_function_all(self, Xj, k=1):
-        raise NotImplementedError
+        """Similar to eval_basis_function_all, but calls
+           evaluate_derivative_basis_function instead of evaluate_basis_function
+        """
+        P = np.zeros((len(Xj), self.N + 1))
+        for j in range(self.N + 1):
+            P[:, j] = self.evaluate_derivative_basis_function(Xj, j)
+        return P
 
     def inner_product(self, u):
         us = map_expression_true_domain(u, x, self.domain, self.reference_domain)
