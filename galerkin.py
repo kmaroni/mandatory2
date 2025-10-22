@@ -348,7 +348,10 @@ class DirichletLegendre(Composite, Legendre):
 
 class NeumannLegendre(Composite, Legendre):
     def __init__(self, N, domain=(-1, 1), bc=(0, 0), constraint=0):
-        raise NotImplementedError
+        """Similar to method in DirichletLegendre, but call Neumann instead."""
+        Legendre.__init__(self, N, domain=domain)
+        self.B = Neumann(bc, domain, self.reference_domain)
+        self.S = sparse.diags((1, -1), (0, 2), shape=(N + 1, N + 3), format="csr")
 
     def basis_function(self, j, sympy=False):
         """Similar to method in DirichletLegendre, but mulitply P_j+2 with
